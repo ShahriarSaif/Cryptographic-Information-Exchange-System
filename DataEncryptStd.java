@@ -5,12 +5,12 @@ public class DataEncryptStd
 	private int p10[] = {2, 4, 1, 6, 3, 9, 0, 8, 7, 5};
 	private int p8[] = {5, 2, 6, 3, 7, 4, 9, 8};
 	private int ip[] = {1, 5, 2, 0, 3, 7, 4, 6};
-	private int ip_inv[] = {3, 0, 2, 4, 6, 17, 5};
+	private int ip_inv[] = {3, 0, 2, 4, 6, 1, 7, 5};
 	private int s0[][] = {{1, 0, 3, 2}, {3, 2, 1, 0},
 						  {0, 2, 1, 3}, {3, 1, 3, 2}};
 	private int s1[][] = {{0, 1, 2, 3}, {2, 0, 1, 3},
 						  {3, 0, 1, 0}, {2, 1, 0, 3}};
-	private int p4[] = {2, 4, 3, 1};
+	private int p4[] = {1, 3, 2, 0};
 
 	private final int BLOCK_SIZE = 8;
 	private final int KEY_SIZE = 10;
@@ -40,7 +40,7 @@ public class DataEncryptStd
 	{
 		int sum = 0;
 		int p = 0;
-		for(int i = 7; i >= 0; --i)
+		for(int i = bin.length - 1; i >= 0; --i)
 			sum += bin[i] * pow(2, p++);
 		return sum;
 	}
@@ -181,7 +181,7 @@ public class DataEncryptStd
 		return res;
 	}
 
-	private int[] encryptFunc(int ara[], int key[])
+	private int[] func(int ara[], int key[])
 	{
 		int res[] = new int[8];
 		int left[] = new int[4];
@@ -196,7 +196,7 @@ public class DataEncryptStd
 			right_xor[i-4] = xor_res[i];
 		int s0_res[] = makeS0(left);
 		int s1_res[] = makeS1(right);
-		int merged = new int[4];
+		int merged[] = new int[4];
 		for(int i = 0; i < 2; ++i)
 			merged[i] = s0_res[i];
 		for(int i = 0; i < 2; ++i)
@@ -218,28 +218,44 @@ public class DataEncryptStd
 		return res;
 	} 
 
-	public int[] encrypt(int pt[], key[][])
+	public int[] encrypt(int pt[], int key[][])
 	{
 		int ip_res[] = new int[8];
 		ip_res = initPermute(pt);
 		for(int i = 0; i < 2; ++i){
-			ip_res = encryptFunc(ip_res, key[i]);
+			ip_res = func(ip_res, key[i]);
 			ip_res = swapBlocks(ip_res);
 		} 
 		ip_res = invIp(ip_res);
-		return ip_res;
-		
+		return ip_res;		
 	} 
+
+	public int[] decrypt(int ct[], int key[][])
+	{
+		int ip_res[] = initPermute(ct);
+		for(int i = 1; i >= 0; --i){
+			ip_res = func(ip_res, key[i]);
+			ip_res = swapBlocks(ip_res);
+		}
+		ip_res = invIp(ip_res);
+		return ip_res;
+	}
 
 	public static void main(String args[])
 	{
 		DataEncryptStd des = new DataEncryptStd();
 		int key[] = {1, 0, 1, 0, 0, 0, 0, 0, 1, 0};
-		int key_gentd[][] = des.generteKey(key);
-		for(int i = 0; i < 2; ++i){
-			for(int j = 0; j < 8; ++j)
-				System.out.printf("%d ", key_gentd[i][j]);
-			System.out.printf("\n");
-		}
+		int key_gentd[][] = des.generateKey(key);
+		int pt[] = {0, 1, 1, 0, 1, 1, 0, 1};
+		int ct[] = des.encrypt(pt, key_gentd);
+
+		System.out.println("cipher text");
+		for(int c : ct)
+			System.out.printf("%d", c);
+		System.out.println();
+		System.out.println("plain text");
+		pt = des.decrypt(ct, key_gentd);
+		for(int p : pt)
+			System.out.printf("%d", p);
 	}
 }
