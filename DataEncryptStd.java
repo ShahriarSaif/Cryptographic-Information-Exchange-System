@@ -72,15 +72,17 @@ public class DataEncryptStd
 		return res;
 	}
 
-	private int[] swapBlocks(int left[], int right[])
+	private int[] swapBlocks(int ara[])
 	{
-		int res[] = new int[BLOCK_SIZE];
-		for(int i = 0; i < BLOCK_SIZE / 2; ++i)
-			res[i] = right[i];
-		for(int i = BLOCK_SIZE / 2 + 1; i < BLOCK_SIZE; ++i)
-			res[i] = left[i];
+		int res[] = new int[ara.length];
+		for(int i = 0; i < ara.length / 2; ++i)
+		    res[ara.length/2+i] = ara[i];
+		for(int i = ara.length / 2; i < ara.length; ++i)
+		    res[i-4] = ara[i];
+		
 		return res;
 	}
+	
 	private int[] expand(int ara[])
 	{
 		int res[] = new int[8];
@@ -110,7 +112,7 @@ public class DataEncryptStd
 		return res;
 	}
 
-	public int[][] generteKey(int initial_key[]) //all ok
+	public int[][] generateKey(int initial_key[]) //all ok
 	{
 		int key[][] = new int[2][8];
 		int p10_res[] = new int[10];
@@ -179,7 +181,7 @@ public class DataEncryptStd
 		return res;
 	}
 
-	private int[] encrypt_func(int ara[], int key[])
+	private int[] encryptFunc(int ara[], int key[])
 	{
 		int res[] = new int[8];
 		int left[] = new int[4];
@@ -207,11 +209,25 @@ public class DataEncryptStd
 			res[4+i] = right[i];
 		return res;
 	}
+	
+	private int[] invIp(int ara[])
+	{
+		int res[] = new int[BLOCK_SIZE];
+		for(int i = 0; i < BLOCK_SIZE; ++i)
+		    res[i] = ara[ip_inv[i]];
+		return res;
+	} 
 
 	public int[] encrypt(int pt[], key[][])
 	{
 		int ip_res[] = new int[8];
 		ip_res = initPermute(pt);
+		for(int i = 0; i < 2; ++i){
+			ip_res = encryptFunc(ip_res, key[i]);
+			ip_res = swapBlocks(ip_res);
+		} 
+		ip_res = invIp(ip_res);
+		return ip_res;
 		
 	} 
 
