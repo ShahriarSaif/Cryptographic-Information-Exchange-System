@@ -7,7 +7,7 @@ public class DataEncryptStd
 	private int ip[] = {1, 5, 2, 0, 3, 7, 4, 6};
 	private int ip_inv[] = {3, 0, 2, 4, 6, 1, 7, 5};
 	private int s0[][] = {{1, 0, 3, 2}, {3, 2, 1, 0},
-						  {0, 2, 1, 3}, {3, 1, 3, 2}};
+						  {0, 2, 3, 1}, {3, 1, 3, 2}};
 	private int s1[][] = {{0, 1, 2, 3}, {2, 0, 1, 3},
 						  {3, 0, 1, 0}, {2, 1, 0, 3}};
 	private int p4[] = {1, 3, 2, 0};
@@ -63,10 +63,10 @@ public class DataEncryptStd
 	{
 		int res[] = new int[ara1.length];
 		for(int i = 0; i < ara1.length; ++i)
-			if(ara1[i] == 1 || ara2[i] == 1)
-				res[i] = 1;
-			else if(ara1[i] == 0 && ara2[i] == 0)
+			if(ara1[i] == 0 && ara2[i] == 0)
 				res[i] = 0;
+			else if((ara1[i] == 0 && ara2[i] == 1) || (ara1[i] == 1 && ara2[i] == 0))
+				res[i] = 1;
 			else
 				res[i] = 0;
 		return res;
